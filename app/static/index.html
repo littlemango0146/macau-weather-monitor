@@ -1,0 +1,512 @@
+﻿<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>澳門氣象資料站</title>
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css?v=20260524-overview1">
+  <link rel="stylesheet" href="/static/styles.css?v=20260524-overview1">
+  <script src="/static/vendor/leaflet/leaflet.js?v=20260524-overview1"></script>
+  <script src="/static/chart-lite.js?v=20260524-overview1"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon" aria-hidden="true">🌤</div>
+      <div>
+        <h1>澳門氣象資料站</h1>
+        <div class="status-row">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">正在載入資料...</span>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="countdown-wrap" title="下次自動刷新倒計時">
+        <svg width="28" height="28" viewBox="0 0 28 28" class="countdown-ring">
+          <circle cx="14" cy="14" r="11" class="ring-bg"/>
+          <circle cx="14" cy="14" r="11" class="ring-fg" id="countdownArc"/>
+        </svg>
+        <span id="countdownText">5:00</span>
+      </div>
+      <button class="btn-refresh" id="refreshBtn" title="立即向 SMG 抓取最新資料">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        立即更新
+      </button>
+      <button class="btn-icon" id="themeBtn" title="切換主題">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-sun">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" class="icon-moon" style="display:none">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+        </svg>
+      </button>
+      <nav>
+        <a href="#map">地圖</a>
+        <a href="#alerts">警告</a>
+        <a href="#wind">風力</a>
+        <a href="#water">水位</a>
+        <a href="#air">空氣</a>
+        <a href="#daily">今日</a>
+        <a href="#rankings">排行</a>
+        <a href="#history">歷史</a>
+        <a href="#compare">對比</a>
+        <a href="/predict" style="color:var(--accent);font-weight:700">🔮 預測</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="overview-status" aria-label="監測總覽狀態">
+      <div class="status-tile warning-tile">
+        <span>官方警告</span>
+        <strong id="overviewWarning">載入中</strong>
+        <small id="overviewWarningDetail">SMG 官方警告與本地派生提示</small>
+      </div>
+      <div class="status-tile">
+        <span>觀測時間</span>
+        <strong id="overviewDataTime">--</strong>
+        <small>SMG 最新觀測記錄</small>
+      </div>
+      <div class="status-tile">
+        <span>資料延遲</span>
+        <strong id="overviewDelay">--</strong>
+        <small id="overviewDelayDetail">與本機時間比較</small>
+      </div>
+      <div class="status-tile">
+        <span>抓取狀態</span>
+        <strong id="overviewFetch">--</strong>
+        <small id="overviewFetchDetail">後端排程器 / 快取</small>
+      </div>
+    </section>
+
+    <section class="metric-matrix" aria-label="監測指標切換">
+      <button class="metric-switch active" data-metric="temperature">氣溫</button>
+      <button class="metric-switch" data-metric="heat_index">體感溫度</button>
+      <button class="metric-switch" data-metric="heat_index">酷熱指數</button>
+      <button class="metric-switch" data-metric="humidity">濕度</button>
+      <button class="metric-switch" data-metric="dew_point">露點</button>
+      <button class="metric-switch" data-metric="wind_speed">10 分鐘風速</button>
+      <button class="metric-switch" data-metric="wind_gust">陣風</button>
+      <button class="metric-switch" data-metric="rainfall_hour">1 小時雨量</button>
+      <button class="metric-switch" data-metric="rainfall_day">今日雨量</button>
+      <button class="metric-switch" data-metric="mean_sea_level_pressure">海平面氣壓</button>
+    </section>
+
+    <!-- 頂部摘要卡片 -->
+    <div class="summary-strip" id="summaryStrip">
+      <div class="summary-card loading">
+        <span class="summary-label">最高溫</span>
+        <strong id="summaryMaxTemp">--</strong>
+        <span class="summary-sub" id="summaryMaxTempStation"></span>
+      </div>
+      <div class="summary-card loading">
+        <span class="summary-label">最低溫</span>
+        <strong id="summaryMinTemp">--</strong>
+        <span class="summary-sub" id="summaryMinTempStation"></span>
+      </div>
+      <div class="summary-card loading">
+        <span class="summary-label">最高濕度</span>
+        <strong id="summaryMaxHumidity">--</strong>
+        <span class="summary-sub" id="summaryMaxHumidityStation"></span>
+      </div>
+      <div class="summary-card loading">
+        <span class="summary-label">最大陣風</span>
+        <strong id="summaryMaxGust">--</strong>
+        <span class="summary-sub" id="summaryMaxGustStation"></span>
+      </div>
+      <div class="summary-card loading">
+        <span class="summary-label">最多雨量</span>
+        <strong id="summaryMaxRain">--</strong>
+        <span class="summary-sub" id="summaryMaxRainStation"></span>
+      </div>
+    </div>
+
+    <!-- 地圖 + 站點詳情 -->
+    <section class="dashboard" id="map">
+      <div class="map-wrap">
+        <div id="weatherMap" aria-label="澳門氣象站地圖">
+          <div id="leafletMap"></div>
+          <div id="mapTiles" aria-hidden="true"></div>
+          <div class="map-fallback" aria-hidden="true">
+            <div class="map-sea"></div>
+            <div class="map-land macau">澳門半島</div>
+            <div class="map-land taipa">氹仔</div>
+            <div class="map-land coloane">路環</div>
+          </div>
+          <div class="map-toolbar">
+            <span id="mapLayerLabel">OSM 地圖</span>
+            <div class="map-toolbar-right">
+              <button class="map-btn" id="mapLayerToggle" title="切換底圖">底圖</button>
+              <button class="map-btn" id="fitMapBtn" title="回到全澳視野">全澳</button>
+              <span>風標 = 風向 + 平均風速</span>
+            </div>
+          </div>
+          <div class="map-legend">
+            <div class="legend-title">溫度 °C</div>
+            <div class="legend-bar"></div>
+            <div class="legend-labels">
+              <span>≤20</span><span>25</span><span>30</span><span>≥35</span>
+            </div>
+          </div>
+          <div id="markerLayer"></div>
+        </div>
+      </div>
+
+      <aside class="station-panel" id="stationPanel">
+        <p class="eyebrow">站點詳情</p>
+        <h2 class="panel-placeholder-title">選擇地圖上的站點</h2>
+        <p class="muted">點擊地圖標記後會顯示最新觀測資料與 24 小時趨勢。</p>
+        <div class="panel-mini-hint">
+          <div class="hint-item">
+            <span class="hint-dot full"></span>全天候站點
+          </div>
+          <div class="hint-item">
+            <span class="hint-dot wind-only"></span>風速站點（橋上）
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="module-board" aria-label="氣象監測模組">
+      <section class="module-panel alert-panel" id="alerts">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">警告與提示</p>
+            <h2>即時風雨風險</h2>
+          </div>
+          <span class="module-status" id="warningStatus">載入中</span>
+        </div>
+        <div class="alert-list" id="warningList">
+          <div class="module-empty">正在讀取本地觀測派生提示...</div>
+        </div>
+      </section>
+
+      <section class="module-panel" id="wind">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">風力指數</p>
+            <h2>橋上與陸地風場</h2>
+          </div>
+          <span class="module-status">Derived</span>
+        </div>
+        <div class="wind-index-panel" id="windIndexPanel"></div>
+      </section>
+
+      <section class="module-panel" id="water">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">水位監測</p>
+            <h2>潮汐與水位入口</h2>
+          </div>
+          <span class="module-status" id="waterStatus">載入中</span>
+        </div>
+        <div class="service-grid" id="waterLevelPanel"></div>
+      </section>
+
+      <section class="module-panel" id="air">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">空氣質量</p>
+            <h2>AQI 與污染物</h2>
+          </div>
+          <span class="module-status" id="airStatus">載入中</span>
+        </div>
+        <div class="service-grid" id="airQualityPanel"></div>
+      </section>
+
+      <section class="module-panel database-panel" id="database">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">天氣數據庫</p>
+            <h2>資料集狀態</h2>
+          </div>
+          <span class="module-status">Archive</span>
+        </div>
+        <div class="dataset-list" id="databasePanel"></div>
+      </section>
+
+      <section class="module-panel quality-panel" id="quality">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">資料品質</p>
+            <h2>來源健康狀態</h2>
+          </div>
+          <span class="module-status" id="qualityStatus">載入中</span>
+        </div>
+        <div class="quality-grid" id="qualityPanel"></div>
+      </section>
+
+      <section class="module-panel index-panel" id="indices">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">UV / METAR</p>
+            <h2>紫外線與機場資料</h2>
+          </div>
+          <span class="module-status">入口</span>
+        </div>
+        <div class="service-grid" id="indexPanel">
+          <a class="service-tile active" href="https://xml.smg.gov.mo/c_actualUVI.xml" target="_blank" rel="noopener">
+            <strong>即時紫外線</strong><span>SMG c_actualUVI.xml</span>
+          </a>
+          <a class="service-tile active" href="https://xml.smg.gov.mo/c_7daysUV.xml" target="_blank" rel="noopener">
+            <strong>七日紫外線</strong><span>SMG c_7daysUV.xml</span>
+          </a>
+          <a class="service-tile active" href="https://xml.smg.gov.mo/c_actual_temperatureindex.xml" target="_blank" rel="noopener">
+            <strong>溫度指數</strong><span>SMG temperature index XML</span>
+          </a>
+          <a class="service-tile active" href="https://aviationweather.gov/data/metar/?id=VMMC" target="_blank" rel="noopener">
+            <strong>機場 METAR</strong><span>VMMC 官方航空天氣入口</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="module-panel warning-history-panel" id="warningHistory">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">警告事件</p>
+            <h2>警告歷史入口</h2>
+          </div>
+          <span class="module-status">規劃中</span>
+        </div>
+        <div class="warning-event-list" id="warningEventList">
+          <div class="module-empty">正在讀取警告事件...</div>
+        </div>
+      </section>
+
+      <section class="module-panel forecast-panel" id="officialForecast">
+        <div class="module-head">
+          <div>
+            <p class="eyebrow">官方預報</p>
+            <h2>SMG 七日預報</h2>
+          </div>
+          <span class="module-status" id="forecastStatus">載入中</span>
+        </div>
+        <div class="service-grid" id="officialForecastPanel"></div>
+      </section>
+    </section>
+
+    <section class="section windy-section" id="windy">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">實時天氣圖</p>
+          <h2>Windy 珠江口實時風場</h2>
+        </div>
+        <a class="external-map-link" href="https://www.windy.com/22.17/113.55?22.17,113.55,8" target="_blank" rel="noopener">開啟 Windy</a>
+      </div>
+      <div class="windy-frame">
+        <iframe
+          title="Windy 珠江口與澳門實時風場"
+          src="https://embed.windy.com/embed2.html?lat=22.17&lon=113.55&detailLat=22.17&detailLon=113.55&width=1100&height=720&zoom=8&level=surface&overlay=wind&product=ecmwf&menu=&message=true&marker=true&calendar=now&pressure=true&type=map&location=coordinates&detail=true&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- 今日統計 -->
+    <section class="section" id="daily">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">今日統計</p>
+          <h2>當日氣象摘要</h2>
+        </div>
+      </div>
+      <div class="daily-grid" id="dailyGrid">
+        <div class="daily-card loading" id="dCardTemp">
+          <div class="daily-icon">🌡</div>
+          <div class="daily-body">
+            <span class="daily-label">今日溫度</span>
+            <div class="daily-range">
+              <span class="daily-hi" id="dTempHi">--</span>
+              <span class="daily-sep">/</span>
+              <span class="daily-lo" id="dTempLo">--</span>
+            </div>
+            <span class="daily-sub" id="dTempSub">°C（高/低）</span>
+          </div>
+        </div>
+        <div class="daily-card loading" id="dCardHumidity">
+          <div class="daily-icon">💧</div>
+          <div class="daily-body">
+            <span class="daily-label">今日濕度</span>
+            <div class="daily-range">
+              <span class="daily-hi" id="dHumHi">--</span>
+              <span class="daily-sep">/</span>
+              <span class="daily-lo" id="dHumLo">--</span>
+            </div>
+            <span class="daily-sub">%（高/低）</span>
+          </div>
+        </div>
+        <div class="daily-card loading" id="dCardPressure">
+          <div class="daily-icon">🔵</div>
+          <div class="daily-body">
+            <span class="daily-label">海平面氣壓</span>
+            <div class="daily-range">
+              <span class="daily-hi" id="dPresHi">--</span>
+              <span class="daily-sep">/</span>
+              <span class="daily-lo" id="dPresLo">--</span>
+            </div>
+            <span class="daily-sub">hPa（高/低）</span>
+          </div>
+        </div>
+        <div class="daily-card loading" id="dCardGust">
+          <div class="daily-icon">💨</div>
+          <div class="daily-body">
+            <span class="daily-label">最大陣風</span>
+            <strong class="daily-big" id="dGust">--</strong>
+            <span class="daily-sub">km/h</span>
+          </div>
+        </div>
+        <div class="daily-card loading" id="dCardRain">
+          <div class="daily-icon">🌧</div>
+          <div class="daily-body">
+            <span class="daily-label">最大今日雨量</span>
+            <strong class="daily-big" id="dRain">--</strong>
+            <span class="daily-sub">mm</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 排行 -->
+    <section class="section" id="rankings">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">即時排行</p>
+          <h2>各站觀測排行</h2>
+        </div>
+        <select id="rankingMetric" aria-label="排行欄位">
+          <option value="temperature">🌡 溫度</option>
+          <option value="heat_index">♨ 體感溫度</option>
+          <option value="humidity">💧 濕度</option>
+          <option value="wind_speed">🌬 平均風速</option>
+          <option value="wind_gust">💨 陣風</option>
+          <option value="rainfall_day">🌧 今日雨量</option>
+          <option value="mean_sea_level_pressure">🔵 海平面氣壓</option>
+          <option value="dew_point">🌿 露點溫度</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>站點</th>
+              <th>地區</th>
+              <th>觀測時間</th>
+              <th>數值</th>
+            </tr>
+          </thead>
+          <tbody id="rankingRows"><tr><td colspan="5" class="table-loading">載入中...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 歷史圖表 -->
+    <section class="section" id="history">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">歷史查詢</p>
+          <h2>站點趨勢圖</h2>
+        </div>
+        <div class="controls">
+          <select id="historyStation" aria-label="歷史站點"></select>
+          <select id="historyMetric" aria-label="歷史欄位">
+            <option value="temperature">溫度</option>
+            <option value="humidity">濕度</option>
+            <option value="wind_speed">平均風速</option>
+            <option value="wind_gust">陣風</option>
+            <option value="rainfall_day">今日雨量</option>
+            <option value="mean_sea_level_pressure">海平面氣壓</option>
+            <option value="dew_point">露點</option>
+            <option value="rainfall_hour">一小時雨量</option>
+          </select>
+          <select id="historyRange" aria-label="時間範圍">
+            <option value="custom">自訂日期</option>
+            <option value="24">最近 24 小時</option>
+            <option value="48">最近 48 小時</option>
+            <option value="72">最近 3 天</option>
+            <option value="168">最近 7 天</option>
+          </select>
+          <select id="historyInterval" aria-label="資料頻率">
+            <option value="">原始資料</option>
+            <option value="5">5 分鐘平均</option>
+            <option value="10">10 分鐘平均</option>
+            <option value="30">30 分鐘平均</option>
+            <option value="60">60 分鐘平均</option>
+          </select>
+          <input id="historyFrom" type="datetime-local" aria-label="開始日期">
+          <input id="historyTo" type="datetime-local" aria-label="結束日期">
+          <a class="dataset-export compact-export" id="historyExportLink" href="/api/export/history.csv" download>匯出 CSV</a>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-stat-grid" id="historyChartStats" aria-label="圖表摘要"></div>
+        <canvas id="historyChart"></canvas>
+      </div>
+      <div class="table-wrap compact">
+        <table>
+          <thead><tr><th>時間</th><th>數值</th></tr></thead>
+          <tbody id="historyRows"><tr><td colspan="2" class="table-loading">載入中...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 多站對比 -->
+    <section class="section" id="compare">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">多站對比</p>
+          <h2>站點比較圖</h2>
+        </div>
+        <div class="controls">
+          <select id="compareMetric" aria-label="對比指標">
+            <option value="temperature">溫度</option>
+            <option value="humidity">濕度</option>
+            <option value="wind_speed">平均風速</option>
+            <option value="wind_gust">陣風</option>
+            <option value="mean_sea_level_pressure">海平面氣壓</option>
+            <option value="rainfall_day">今日雨量</option>
+          </select>
+          <select id="compareRange" aria-label="對比時間範圍">
+            <option value="24">最近 24 小時</option>
+            <option value="48">最近 48 小時</option>
+            <option value="72">最近 3 天</option>
+          </select>
+        </div>
+      </div>
+      <div class="group-presets" id="groupPresets" aria-label="站點群組比較">
+        <button class="group-chip" data-group="all" data-metric="temperature">全澳氣溫</button>
+        <button class="group-chip" data-group="all" data-metric="humidity">全澳濕度</button>
+        <button class="group-chip" data-group="all" data-metric="rainfall_day">全澳雨量</button>
+        <button class="group-chip" data-group="all" data-metric="wind_speed">全澳風速</button>
+        <button class="group-chip" data-group="bridge" data-metric="wind_speed">跨海大橋風速</button>
+        <button class="group-chip" data-group="land" data-metric="wind_speed">陸地站風速</button>
+        <button class="group-chip" data-group="macau" data-metric="temperature">澳門半島站</button>
+        <button class="group-chip" data-group="islands" data-metric="temperature">氹仔路環站</button>
+      </div>
+      <div class="compare-station-picker" id="compareStationPicker">
+        <!-- 動態生成站點勾選框 -->
+      </div>
+      <div class="chart-card">
+        <div class="chart-context-line" id="compareChartContext">選擇 2 至 4 個站點會較容易比較。</div>
+        <canvas id="compareChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>資料來源：<a href="https://www.smg.gov.mo" target="_blank" rel="noopener">澳門氣象局 SMG</a></span>
+    <span id="footerUpdate"></span>
+  </footer>
+
+  <script src="/static/app.js?v=20260524-overview1"></script>
+</body>
+</html>

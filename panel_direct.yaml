@@ -1,0 +1,34 @@
+- generic [active] [ref=e1]:
+  - heading "查詢氣象觀測資料:" [level=2] [ref=e3]
+  - table [ref=e5]:
+    - rowgroup [ref=e6]:
+      - 'row "輸入日期: 輸入月份:" [ref=e7]':
+        - cell "輸入日期:" [ref=e8]:
+          - radio [ref=e9]
+          - generic [ref=e10]: "輸入日期:"
+        - cell "輸入月份:" [ref=e11]:
+          - radio [checked] [ref=e12]
+          - generic [ref=e13]: "輸入月份:"
+      - row "從 查詢 重設" [ref=e14]:
+        - cell "從" [ref=e15]:
+          - generic [ref=e16]:
+            - text: 從
+            - textbox [ref=e17]
+        - cell [ref=e18]:
+          - textbox [ref=e20]
+        - cell "查詢" [ref=e21]:
+          - button "查詢" [ref=e22]
+        - cell "重設" [ref=e23]:
+          - button "重設" [ref=e24]
+      - row "至 ( yyyy-mm )" [ref=e25]:
+        - cell "至" [ref=e26]:
+          - generic [ref=e27]:
+            - text: 至
+            - textbox [ref=e28]
+        - cell "( yyyy-mm )" [ref=e29]:
+          - generic [ref=e30]: ( yyyy-mm )
+      - row "(yyyy-mm-dd)" [ref=e31]:
+        - cell "(yyyy-mm-dd)" [ref=e32]:
+          - generic [ref=e33]: (yyyy-mm-dd)
+  - iframe [ref=e34]:
+    

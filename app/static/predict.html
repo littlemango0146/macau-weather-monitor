@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>三天天氣預測 - 澳門氣象資料站</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    :root {
+      --predict-bg: #071114;
+      --predict-panel: #0d1c21;
+      --predict-panel-2: #11272e;
+      --predict-line: rgba(154, 188, 198, .18);
+      --predict-text: #eef8fa;
+      --predict-muted: #8aa1a9;
+      --predict-blue: #00b8e0;
+      --predict-orange: #ff8a3d;
+      --predict-green: #64d99b;
+    }
+
+    body {
+      background:
+        linear-gradient(180deg, rgba(0, 184, 224, .08), transparent 360px),
+        var(--predict-bg);
+      color: var(--predict-text);
+    }
+
+    .predict-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: calc(var(--topbar-h) + 28px) 20px 56px;
+    }
+
+    .predict-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 22px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .predict-kicker {
+      color: var(--predict-blue);
+      font-size: 12px;
+      letter-spacing: .16em;
+      margin: 0 0 10px;
+      text-transform: uppercase;
+    }
+
+    .predict-head h1 {
+      font-size: clamp(30px, 5vw, 58px);
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .predict-head p {
+      max-width: 720px;
+      color: var(--predict-muted);
+      margin: 14px 0 0;
+      line-height: 1.75;
+    }
+
+    .predict-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .predict-btn {
+      border: 1px solid var(--predict-line);
+      background: var(--predict-panel);
+      color: var(--predict-text);
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .predict-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0, 184, 224, .62);
+    }
+
+    .predict-btn.primary {
+      color: #061216;
+      background: var(--predict-blue);
+      border-color: transparent;
+    }
+
+    .predict-btn:disabled {
+      opacity: .58;
+      cursor: wait;
+      transform: none;
+    }
+
+    .forecast-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .forecast-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .forecast-card {
+      min-height: 292px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent), var(--predict-panel);
+      border: 1px solid var(--predict-line);
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .forecast-date {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--predict-muted);
+      font-size: 13px;
+    }
+
+    .forecast-main {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .weather-symbol {
+      width: 68px;
+      height: 68px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      font-weight: 900;
+      background: var(--predict-panel-2);
+      border: 1px solid var(--predict-line);
+    }
+
+    .temp-big {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--predict-orange);
+    }
+
+    .temp-sub {
+      color: var(--predict-muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .mini-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--predict-line);
+      color: var(--predict-muted);
+      font-size: 13px;
+    }
+
+    .mini-metric strong {
+      color: var(--predict-text);
+      font-size: 15px;
+    }
+
+    .rain-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .rain-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: var(--predict-blue);
+    }
+
+    .model-panel {
+      background: var(--predict-panel);
+      border: 1px solid var(--predict-line);
+      border-radius: 8px;
+      padding: 18px;
+      position: sticky;
+      top: calc(var(--topbar-h) + 16px);
+    }
+
+    .model-panel h2 {
+      font-size: 18px;
+      margin: 0 0 14px;
+    }
+
+    .status-box {
+      border-radius: 8px;
+      background: var(--predict-panel-2);
+      border: 1px solid var(--predict-line);
+      padding: 14px;
+      color: var(--predict-muted);
+      line-height: 1.6;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .status-box.ok {
+      color: var(--predict-green);
+      border-color: rgba(100, 217, 155, .32);
+    }
+
+    .status-box.err {
+      color: #ff9b86;
+      border-color: rgba(255, 155, 134, .36);
+    }
+
+    .metric-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--predict-muted);
+      font-size: 13px;
+    }
+
+    .metric-row strong {
+      color: var(--predict-text);
+    }
+
+    .empty-forecast {
+      grid-column: 1 / -1;
+      min-height: 292px;
+      border: 1px dashed var(--predict-line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--predict-muted);
+      text-align: center;
+      padding: 24px;
+      background: rgba(255,255,255,.025);
+    }
+
+    @media (max-width: 900px) {
+      .predict-head,
+      .forecast-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .predict-actions {
+        justify-content: flex-start;
+      }
+
+      .forecast-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .model-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon" aria-hidden="true">3D</div>
+      <div>
+        <h1>澳門氣象資料站</h1>
+        <div class="status-row">
+          <span class="status-dot ok"></span>
+          <span>三天天氣預測模型</span>
+        </div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <nav>
+        <a href="/">地圖</a>
+        <a href="/#rankings">排行</a>
+        <a href="/#history">歷史</a>
+        <a href="/predict" style="color:var(--accent);font-weight:700">預測</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="predict-shell">
+    <section class="predict-head">
+      <div>
+        <p class="predict-kicker">Local ML Forecast</p>
+        <h1>未來 3 天天氣預測</h1>
+        <p>使用 `smg_history.csv` 的每日氣壓、溫度、濕度、露點、日照、風向、風速和雨量資料，訓練三組直接預測模型，分別預測明日、第 2 日和第 3 日。</p>
+      </div>
+      <div class="predict-actions">
+        <button class="predict-btn" id="trainBtn">重新訓練</button>
+        <button class="predict-btn primary" id="forecastBtn">取得 3 天預測</button>
+      </div>
+    </section>
+
+    <section class="forecast-layout">
+      <div class="forecast-grid" id="forecastGrid">
+        <div class="empty-forecast">按「取得 3 天預測」讀取模型結果；如模型不存在，先按「重新訓練」。</div>
+      </div>
+
+      <aside class="model-panel">
+        <h2>模型狀態</h2>
+        <div class="status-box" id="statusBox">正在檢查模型...</div>
+        <div class="metric-list" id="metricList"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const forecastGrid = document.getElementById("forecastGrid");
+    const statusBox = document.getElementById("statusBox");
+    const metricList = document.getElementById("metricList");
+    const trainBtn = document.getElementById("trainBtn");
+    const forecastBtn = document.getElementById("forecastBtn");
+
+    function setStatus(text, type = "") {
+      statusBox.className = "status-box" + (type ? ` ${type}` : "");
+      statusBox.textContent = text;
+    }
+
+    function weatherSymbol(item) {
+      if ((item.rain_prob || 0) >= 0.65) return "雨";
+      if ((item.rain_prob || 0) >= 0.35) return "雲";
+      if ((item.temp_max || 0) >= 32) return "熱";
+      return "晴";
+    }
+
+    function weekday(dateText) {
+      return new Intl.DateTimeFormat("zh-Hant-MO", { weekday: "long" }).format(new Date(`${dateText}T00:00:00`));
+    }
+
+    function renderForecast(items) {
+      forecastGrid.innerHTML = items.map((item) => {
+        const rainPct = Math.round((item.rain_prob || 0) * 100);
+        return `
+          <article class="forecast-card">
+            <div class="forecast-date">
+              <strong>第 ${item.day_index} 天</strong>
+              <span>${item.date} ${weekday(item.date)}</span>
+            </div>
+            <div class="forecast-main">
+              <div class="weather-symbol">${weatherSymbol(item)}</div>
+              <div>
+                <div class="temp-big">${item.temp_avg?.toFixed ? item.temp_avg.toFixed(1) : item.temp_avg}°C</div>
+                <div class="temp-sub">最高 ${item.temp_max}°C / 最低 ${item.temp_min}°C</div>
+              </div>
+            </div>
+            <div class="metric-stack">
+              <div>
+                <div class="mini-metric"><span>降雨機率</span><strong>${rainPct}%</strong></div>
+                <div class="rain-track"><div class="rain-fill" style="width:${rainPct}%"></div></div>
+              </div>
+              <div class="mini-metric"><span>預測雨量</span><strong>${item.rainfall_mm} mm</strong></div>
+              <div class="mini-metric"><span>相對濕度</span><strong>${item.humidity_pct}%</strong></div>
+              <div class="mini-metric"><span>平均風速</span><strong>${item.wind_speed_kmh} km/h</strong></div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderMetrics(meta) {
+      if (!meta || !meta.metrics) {
+        metricList.innerHTML = "";
+        return;
+      }
+      const d1 = meta.metrics.day_1 || {};
+      metricList.innerHTML = `
+        <div class="metric-row"><span>模型</span><strong>${meta.model || "本地模型"}</strong></div>
+        <div class="metric-row"><span>資料範圍</span><strong>${meta.history_start || "--"} 至 ${meta.history_end || "--"}</strong></div>
+        <div class="metric-row"><span>訓練樣本</span><strong>${meta.n_samples || "--"} 日</strong></div>
+        <div class="metric-row"><span>明日平均溫 MAE</span><strong>${d1.temp_avg?.mae ?? "--"} °C</strong></div>
+        <div class="metric-row"><span>明日降雨 AUC</span><strong>${d1.rain_yn?.auc ?? "--"}</strong></div>
+      `;
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || `HTTP ${res.status}`);
+      return data;
+    }
+
+    async function loadMetrics() {
+      try {
+        const meta = await fetchJson("/api/predict/metrics");
+        setStatus(`模型已訓練：${meta.trained_on}，可預測未來 ${meta.forecast_days} 天。`, "ok");
+        renderMetrics(meta);
+      } catch {
+        setStatus("尚未找到模型。請先按「重新訓練」，系統會用本機 CSV 建立新的 3 天模型。");
+      }
+    }
+
+    trainBtn.addEventListener("click", async () => {
+      trainBtn.disabled = true;
+      forecastBtn.disabled = true;
+      setStatus("正在訓練模型，請稍候...");
+      try {
+        const data = await fetchJson("/api/predict/train");
+        setStatus(`訓練完成：${data.meta.trained_on}，使用 ${data.meta.n_samples} 日資料。`, "ok");
+        renderMetrics(data.meta);
+        await loadForecast();
+      } catch (err) {
+        setStatus(`訓練失敗：${err.message}`, "err");
+      } finally {
+        trainBtn.disabled = false;
+        forecastBtn.disabled = false;
+      }
+    });
+
+    async function loadForecast() {
+      forecastBtn.disabled = true;
+      try {
+        const data = await fetchJson("/api/predict/forecast");
+        renderForecast(data.forecast);
+        renderMetrics(data.metrics);
+        setStatus("已取得最新 3 天預測。", "ok");
+      } catch (err) {
+        forecastGrid.innerHTML = `<div class="empty-forecast">${err.message}</div>`;
+        setStatus(`讀取預測失敗：${err.message}`, "err");
+      } finally {
+        forecastBtn.disabled = false;
+      }
+    }
+
+    forecastBtn.addEventListener("click", loadForecast);
+    loadMetrics();
+  </script>
+</body>
+</html>

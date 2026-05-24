@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+apscheduler
+httpx
+jinja2
+pytest
+pandas
+scikit-learn
+joblib

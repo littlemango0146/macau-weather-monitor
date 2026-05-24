@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ActualWeather>
+  <System>
+    <SysAuthor>DSMG-DDI</SysAuthor>
+    <SysPubdate>2026-05-23 14:15</SysPubdate>
+    <SysLanguage>0</SysLanguage>
+    <version>1.04</version>
+  </System>
+  <Custom>
+    <WeatherReport>
+      <station code="TG">
+        <stationname>大潭山</stationname>
+        <RecordTime>2026-05-23 14:15</RecordTime>
+        <Temperature><MeasureUnit>°C</MeasureUnit><Type>3</Type><Value>28</Value><dValue>28.2</dValue></Temperature>
+        <Humidity><MeasureUnit>%</MeasureUnit><Type>3</Type><Value>88</Value><dValue>88</dValue></Humidity>
+        <DewPoint><MeasureUnit>°C</MeasureUnit><Type>3</Type><Value>26</Value><dValue>26.0</dValue></DewPoint>
+        <WindGust><MeasureUnit>km/h</MeasureUnit><Type>3</Type><Value>27</Value><dValue>26.6</dValue></WindGust>
+        <WindSpeed><MeasureUnit>km/h</MeasureUnit><Type>3</Type><Value>13</Value><dValue>13.3</dValue></WindSpeed>
+        <Rainfall><MeasureUnit>mm</MeasureUnit><Type>3</Type><Value>0.0</Value><dValue>0.0</dValue></Rainfall>
+        <Rainfall><MeasureUnit>mm</MeasureUnit><Type>4</Type><Value>1.2</Value><dValue>1.2</dValue></Rainfall>
+        <Rainfall><MeasureUnit>mm</MeasureUnit><Type>5</Type><Value>8.4</Value><dValue>8.4</dValue></Rainfall>
+        <WindDirection><MeasureUnit>°</MeasureUnit><Type>3</Type><Value>S</Value><dValue>S</dValue><Degree>175</Degree><WindDescription>南</WindDescription></WindDirection>
+        <MeanSeaLevelPressure><MeasureUnit>hPa</MeasureUnit><Type>3</Type><Value>1008.9</Value><dValue>1008.9</dValue></MeanSeaLevelPressure>
+        <StationPressure><MeasureUnit>hPa</MeasureUnit><Type>3</Type><Value>996.1</Value><dValue>996.1</dValue></StationPressure>
+      </station>
+    </WeatherReport>
+    <WeatherReport>
+      <station code="MN">
+        <stationname>澳門大橋北</stationname>
+        <RecordTime>2026-05-23 14:15</RecordTime>
+        <WindGust><MeasureUnit>km/h</MeasureUnit><Type>3</Type><Value>36</Value><dValue>36.4</dValue></WindGust>
+        <WindSpeed><MeasureUnit>km/h</MeasureUnit><Type>3</Type><Value>25</Value><dValue>25.2</dValue></WindSpeed>
+        <WindDirection><MeasureUnit>°</MeasureUnit><Type>3</Type><Value>SSW</Value><dValue>SSW</dValue><Degree>191</Degree><WindDescription>西南偏南</WindDescription></WindDirection>
+      </station>
+    </WeatherReport>
+  </Custom>
+</ActualWeather>

@@ -1,0 +1,2058 @@
+/* =============================================
+   CSS 自訂屬性 & 主題
+   ============================================= */
+:root {
+  --bg: #0d1a20;
+  --bg2: #13242d;
+  --panel: #f7fbfc;
+  --panel-ink: #0e2030;
+  --ink: #e8f2f6;
+  --muted: #7a909a;
+  --line: #d0dce3;
+  --line-dark: rgba(255,255,255,.10);
+  --accent: #00b8e0;
+  --accent-dim: rgba(0,184,224,.15);
+  --accent-2: #c8e03a;
+  --danger: #e05252;
+  --success: #3ac87e;
+  --warning: #f0a440;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 8px 32px rgba(0,0,0,.22);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.14);
+  --topbar-h: 64px;
+  --transition: .18s ease;
+}
+
+[data-theme="light"] {
+  --bg: #eef4f7;
+  --bg2: #e3ecf1;
+  --panel: #ffffff;
+  --panel-ink: #0e2030;
+  --ink: #1a2f3c;
+  --muted: #5a7280;
+  --line: #c8d8e0;
+  --line-dark: rgba(0,0,0,.10);
+  --accent: #0095b8;
+  --accent-dim: rgba(0,149,184,.12);
+  --accent-2: #6b9a00;
+  --shadow: 0 4px 20px rgba(0,0,0,.10);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.08);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* =============================================
+   頂部導覽欄
+   ============================================= */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 24px;
+  height: var(--topbar-h);
+  border-bottom: 1px solid var(--line-dark);
+  background: rgba(10, 22, 30, .92);
+  color: white;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+[data-theme="light"] .topbar {
+  background: rgba(255,255,255,.92);
+  color: var(--panel-ink);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255,255,255,.65);
+}
+
+[data-theme="light"] .status-row { color: var(--muted); }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.status-dot.ok { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.status-dot.error { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.status-dot.loading { background: var(--warning); animation: pulse 1.2s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.08);
+  color: white;
+  cursor: pointer;
+  transition: background var(--transition), transform .12s;
+}
+
+[data-theme="light"] .btn-icon { background: var(--panel); color: var(--panel-ink); border-color: var(--line); }
+
+.btn-icon:hover { background: rgba(255,255,255,.18); }
+[data-theme="light"] .btn-icon:hover { background: var(--accent-dim); }
+
+.btn-icon svg { width: 18px; height: 18px; }
+.btn-icon.spinning svg { animation: spin .5s linear; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 立即更新按鈕 */
+.btn-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: rgba(0,184,224,.15);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, transform .1s, box-shadow .15s;
+  white-space: nowrap;
+}
+
+.btn-refresh svg { width: 15px; height: 15px; flex-shrink: 0; }
+.btn-refresh:hover { background: rgba(0,184,224,.28); box-shadow: 0 0 0 3px rgba(0,184,224,.2); }
+.btn-refresh:active { transform: scale(.95); }
+[data-theme="light"] .btn-refresh { background: rgba(0,120,200,.1); border-color: var(--accent); color: var(--accent); }
+[data-theme="light"] .btn-refresh:hover { background: rgba(0,120,200,.2); }
+.btn-refresh.spinning svg { animation: spin .6s linear infinite; }
+
+/* 狀態列提示字 */
+.status-fetch-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,.5);
+  margin-left: 6px;
+}
+[data-theme="light"] .status-fetch-hint { color: var(--muted); }
+
+/* 倒計時圓環 */
+.countdown-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+}
+
+[data-theme="light"] .countdown-wrap { color: var(--muted); }
+
+.countdown-ring { transform: rotate(-90deg); }
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255,255,255,.15);
+  stroke-width: 3;
+}
+
+[data-theme="light"] .ring-bg { stroke: var(--line); }
+
+.ring-fg {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-dasharray: 69.12;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+nav {
+  display: flex;
+  gap: 6px;
+}
+
+.topbar a {
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
+  padding: 7px 12px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.06);
+  font-size: 14px;
+  transition: background var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+
+[data-theme="light"] .topbar a {
+  color: var(--panel-ink);
+  border-color: var(--line);
+  background: var(--panel);
+}
+
+.topbar a:hover {
+  background: rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.3);
+}
+
+[data-theme="light"] .topbar a:hover { background: var(--accent-dim); }
+
+/* =============================================
+   摘要條
+   ============================================= */
+.overview-status {
+  display: grid;
+  grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0 10px;
+}
+
+.status-tile {
+  min-height: 86px;
+  padding: 14px 16px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--panel-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-tile.warning-tile {
+  background: linear-gradient(135deg, rgba(224,82,82,.12), var(--panel));
+}
+
+.status-tile span,
+.status-tile small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status-tile strong {
+  display: block;
+  margin: 5px 0 4px;
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--panel-ink);
+}
+
+.metric-matrix {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.metric-switch,
+.group-chip {
+  min-height: 38px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--panel-ink);
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.metric-switch:hover,
+.metric-switch.active,
+.group-chip:hover,
+.group-chip.active {
+  border-color: var(--accent);
+  background: rgba(0,184,224,.10);
+  color: var(--accent);
+}
+
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 12px;
+  margin: 18px 0;
+  padding: 0 0;
+}
+
+.summary-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .14s, box-shadow .14s;
+  min-width: 0;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.summary-card.loading strong { opacity: .3; }
+
+.summary-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 4px;
+}
+
+.summary-card strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1.1;
+  color: var(--panel-ink);
+  font-weight: 800;
+}
+
+.summary-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =============================================
+   主佈局
+   ============================================= */
+main {
+  width: min(1400px, 100%);
+  margin: 0 auto;
+  padding: 0 20px 32px;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(330px, .75fr);
+  gap: 16px;
+  min-height: 640px;
+}
+
+.map-wrap,
+.station-panel,
+.section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  color: var(--panel-ink);
+  overflow: hidden;
+}
+
+/* =============================================
+   地圖
+   ============================================= */
+.map-wrap {
+  min-height: 640px;
+}
+
+#weatherMap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #cfe0e5;
+}
+
+#leafletMap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+#mapTiles,
+.map-fallback,
+#markerLayer {
+  position: absolute;
+  inset: 0;
+}
+
+#mapTiles { z-index: 1; }
+
+.leaflet-ready #mapTiles,
+.leaflet-ready .map-fallback,
+.leaflet-ready #markerLayer {
+  display: none;
+}
+
+.leaflet-container {
+  font: inherit;
+  background: #cfe0e5;
+}
+
+.leaflet-control-zoom a {
+  color: #10242d;
+}
+
+.map-tile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  user-select: none;
+}
+
+/* 衛星圖模式 */
+.satellite .map-tile {
+  filter: saturate(.8) brightness(.9);
+}
+
+.map-fallback { z-index: 0; }
+
+.map-sea {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 24% 20%, rgba(255,255,255,.5), transparent 22%),
+    linear-gradient(135deg, #b8d8e4, #c4dbe6);
+}
+
+.map-land {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(64,95,66,.4);
+  background: #d6e5c8;
+  color: #2e5030;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.4);
+}
+
+.map-land.macau { left:34%; top:10%; width:18%; height:34%; border-radius:46% 54% 42% 58%; }
+.map-land.taipa { left:47%; top:50%; width:22%; height:18%; border-radius:48% 52% 55% 45%; }
+.map-land.coloane { left:45%; top:72%; width:30%; height:18%; border-radius:52% 48% 46% 54%; }
+
+.map-toolbar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.map-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-toolbar span,
+.map-btn {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(8,20,26,.76);
+  color: white;
+  font-size: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.22);
+  border: 1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.map-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.map-btn:hover { background: rgba(0,184,224,.7); }
+
+/* 溫度圖例 */
+.map-legend {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  z-index: 5;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(8,20,26,.76);
+  color: white;
+  font-size: 11px;
+  border: 1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(8px);
+  min-width: 110px;
+}
+
+.legend-title { font-weight: 600; margin-bottom: 5px; }
+
+.legend-bar {
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #4575b4, #91bfdb, #fee090, #fc8d59, #d73027);
+  margin-bottom: 3px;
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  opacity: .75;
+}
+
+#markerLayer { z-index: 3; }
+
+/* =============================================
+   站點標記
+   ============================================= */
+.station-marker {
+  position: absolute;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 2.5px solid white;
+  border-radius: 50%;
+  background: rgba(12,28,38,.86);
+  color: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+
+.leaflet-station-icon {
+  background: transparent;
+  border: 0;
+}
+
+.leaflet-station-icon .station-marker {
+  position: relative;
+  transform: none;
+}
+
+.leaflet-station-icon .station-marker:hover,
+.leaflet-station-icon .station-marker.active {
+  transform: scale(1.18);
+}
+
+.leaflet-station-icon .station-label {
+  left: 22px;
+  top: -8px;
+}
+
+.station-marker.wind-only {
+  background: rgba(38,55,25,.9);
+  border-color: rgba(255,255,255,.75);
+}
+
+.station-marker:hover {
+  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 8px 28px rgba(0,0,0,.45);
+}
+
+.station-marker.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0,184,224,.3), 0 8px 28px rgba(0,0,0,.45);
+  transform: translate(-50%, -50%) scale(1.12);
+}
+
+/* 溫度顏色 */
+.station-marker[data-temp-tier="cold"]    { border-color: #91bfdb; }
+.station-marker[data-temp-tier="cool"]    { border-color: #fee090; }
+.station-marker[data-temp-tier="warm"]    { border-color: #fc8d59; }
+.station-marker[data-temp-tier="hot"]     { border-color: #d73027; }
+
+.station-label {
+  position: absolute;
+  z-index: 2;
+  transform: translate(22px, -30px);
+  white-space: nowrap;
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: rgba(8,20,26,.84);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 1px 6px rgba(0,0,0,.15);
+  pointer-events: none;
+}
+
+.coord-note {
+  margin: -4px 0 14px;
+  color: var(--faint);
+  font-size: 12px;
+}
+
+.wind-barb { width: 40px; height: 40px; overflow: visible; }
+
+.wind-barb line,
+.wind-barb path {
+  stroke: #ffffff;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.wind-barb .flag { stroke: var(--accent-2); }
+
+.wind-speed-chip {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  min-width: 30px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  color: #142025;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* 溫度標籤（疊在標記上） */
+.temp-chip {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 30px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  color: #14202a;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* =============================================
+   站點詳情面板
+   ============================================= */
+.station-panel {
+  padding: 22px;
+  overflow-y: auto;
+}
+
+.station-panel h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.panel-placeholder-title {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.panel-mini-hint {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hint-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.hint-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  flex-shrink: 0;
+}
+
+.hint-dot.full { background: rgba(12,28,38,.86); }
+.hint-dot.wind-only { background: rgba(38,55,25,.9); }
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.muted { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+/* 觀測資料卡片 */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 9px;
+  margin: 14px 0 10px;
+}
+
+.metric-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 13px;
+  background: #f5f9fb;
+  transition: background var(--transition);
+}
+
+[data-theme="light"] .metric-card { background: #f0f6fa; }
+
+.metric-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 20px;
+  color: var(--panel-ink);
+  line-height: 1.2;
+}
+
+.metric-card .metric-unit {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.metric-card.highlight {
+  border-color: var(--accent);
+  background: rgba(0,184,224,.07);
+}
+
+.metric-card.highlight strong { color: var(--accent); }
+
+/* 迷你歷史圖 */
+.mini-chart-wrap {
+  margin-top: 14px;
+}
+
+.mini-chart-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.mini-chart-wrap canvas {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: #f8fbfc;
+}
+
+/* 風向資訊 */
+.wind-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: #f0f6fa;
+  border: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.wind-compass {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+/* =============================================
+   排行表
+   ============================================= */
+.section {
+  margin-top: 16px;
+  padding: 22px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.section-head h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+select {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  background: var(--panel);
+  color: var(--panel-ink);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+
+select:hover { border-color: var(--accent); }
+select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+th, td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #eff5f8;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  white-space: nowrap;
+}
+
+[data-theme="light"] th { background: #f0f6fa; }
+
+tr:last-child td { border-bottom: 0; }
+
+tr:hover td { background: rgba(0,184,224,.04); }
+
+td.table-loading {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+}
+
+/* 排名數字 */
+.rank-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--line);
+  color: var(--muted);
+}
+
+.rank-num.gold { background: #ffd700; color: #5a4000; }
+.rank-num.silver { background: #c0c0c0; color: #333; }
+.rank-num.bronze { background: #cd7f32; color: #fff; }
+
+.region-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =============================================
+   歷史圖表
+   ============================================= */
+.chart-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  background: var(--panel);
+  position: relative;
+}
+
+.chart-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.chart-stat {
+  padding: 9px 10px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: #f8fbfc;
+}
+
+.chart-stat span,
+.chart-context-line {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chart-stat strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--panel-ink);
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.chart-context-line {
+  margin-bottom: 10px;
+}
+
+#historyChart {
+  width: 100% !important;
+  height: 330px !important;
+}
+
+.compact { max-height: 320px; }
+
+/* =============================================
+   今日統計
+   ============================================= */
+.daily-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 12px;
+}
+
+.daily-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f5f9fb;
+  transition: transform .14s, box-shadow .14s;
+}
+
+[data-theme="light"] .daily-card { background: #f0f6fa; }
+
+.daily-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.daily-card.loading { opacity: .55; }
+
+.daily-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.daily-body {
+  min-width: 0;
+}
+
+.daily-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 2px;
+}
+
+.daily-range {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1.1;
+}
+
+.daily-hi {
+  font-size: 22px;
+  font-weight: 800;
+  color: #e05252;
+}
+
+.daily-sep {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.daily-lo {
+  font-size: 22px;
+  font-weight: 800;
+  color: #4575b4;
+}
+
+.daily-big {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--panel-ink);
+  line-height: 1.1;
+}
+
+.daily-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* =============================================
+   熱感指數卡片
+   ============================================= */
+.heat-index-card {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: #f5f9fb;
+}
+
+.hi-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hi-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.hi-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--panel-ink);
+}
+
+.hi-comfort {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 2px 8px;
+}
+
+.comfort-ok      { background: rgba(58,200,126,.15); border-color: #3ac87e; }
+.comfort-ok .hi-comfort { color: #2a9960; }
+.comfort-warn    { background: rgba(240,164,64,.15); border-color: #f0a440; }
+.comfort-warn .hi-comfort { color: #c07a10; background: rgba(240,164,64,.2); }
+.comfort-hot     { background: rgba(252,141,89,.15); border-color: #fc8d59; }
+.comfort-hot .hi-comfort { color: #c04010; background: rgba(252,141,89,.2); }
+.comfort-danger  { background: rgba(224,82,82,.15); border-color: #e05252; }
+.comfort-danger .hi-comfort { color: #b03030; background: rgba(224,82,82,.2); }
+.comfort-extreme { background: rgba(160,30,100,.15); border-color: #a01e64; }
+.comfort-extreme .hi-comfort { color: #a01e64; background: rgba(160,30,100,.2); }
+
+/* =============================================
+   多站對比
+   ============================================= */
+.compare-station-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.compare-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--panel);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  color: var(--panel-ink);
+  user-select: none;
+}
+
+.compare-chip input { display: none; }
+
+.compare-chip:hover {
+  border-color: var(--chip-color, var(--accent));
+  background: color-mix(in srgb, var(--chip-color, var(--accent)) 10%, transparent);
+}
+
+.compare-chip.selected {
+  border-color: var(--chip-color, var(--accent));
+  background: color-mix(in srgb, var(--chip-color, var(--accent)) 18%, transparent);
+  color: var(--panel-ink);
+}
+
+#compareChart {
+  width: 100% !important;
+  height: 330px !important;
+}
+
+/* =============================================
+   響應式補充
+   ============================================= */
+@media (max-width: 1100px) {
+  .daily-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .daily-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .forecast-panel .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .daily-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =============================================
+   頁尾
+   ============================================= */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--line-dark);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+[data-theme="light"] .site-footer { border-top-color: var(--line); }
+
+.site-footer a { color: var(--accent); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+
+/* =============================================
+   錯誤狀態
+   ============================================= */
+.error-text { color: var(--danger); }
+
+/* =============================================
+   響應式
+   ============================================= */
+@media (max-width: 1100px) {
+  .summary-strip {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+  .summary-strip .summary-card:nth-child(4),
+  .summary-strip .summary-card:nth-child(5) {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .station-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .map-wrap, #weatherMap { min-height: 480px; }
+
+  .topbar {
+    padding: 0 16px;
+    gap: 10px;
+  }
+
+  .topbar h1 { font-size: 16px; }
+
+  .station-marker { width: 46px; height: 46px; }
+
+  nav { display: none; }
+
+  .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-strip {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .summary-card strong { font-size: 22px; }
+}
+
+@media (max-width: 560px) {
+  main { padding: 0 12px 24px; }
+
+  .summary-strip { grid-template-columns: 1fr; }
+
+  .cards { grid-template-columns: 1fr; }
+
+  .topbar-right { gap: 6px; }
+
+  .countdown-wrap { display: none; }
+}
+
+/* =============================================
+   Professional weather-console refinement
+   ============================================= */
+:root {
+  --console-bg: #071116;
+  --console-surface: #0d1b22;
+  --console-surface-2: #10242d;
+  --console-card: #f8fbfc;
+  --console-ink: #10222d;
+  --console-muted: #708893;
+  --console-rule: rgba(16,34,45,.12);
+  --marker: #14232b;
+  --marker-wind: #26351d;
+}
+
+body {
+  background:
+    linear-gradient(180deg, rgba(0,184,224,.08), transparent 280px),
+    var(--bg);
+}
+
+main {
+  padding-top: 14px;
+}
+
+.summary-strip {
+  gap: 10px;
+  margin: 12px 0 14px;
+}
+
+.summary-card,
+.daily-card,
+.section,
+.station-panel,
+.map-wrap {
+  border-radius: 8px;
+}
+
+.summary-card {
+  padding: 12px 14px;
+  box-shadow: none;
+  border-color: var(--console-rule);
+}
+
+.summary-card:hover,
+.daily-card:hover {
+  transform: none;
+  box-shadow: 0 8px 22px rgba(16,34,45,.08);
+}
+
+.summary-label,
+.daily-label,
+th {
+  letter-spacing: .08em;
+}
+
+.summary-card strong {
+  font-size: 24px;
+}
+
+.dashboard {
+  grid-template-columns: minmax(0, 1.72fr) minmax(340px, .72fr);
+  gap: 14px;
+  min-height: 620px;
+}
+
+.map-wrap,
+#weatherMap {
+  min-height: 620px;
+}
+
+#weatherMap {
+  background: #b8d8e4;
+}
+
+#mapTiles {
+  filter: saturate(.92) contrast(.96);
+}
+
+#weatherMap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(6,18,24,.12), transparent 90px),
+    radial-gradient(circle at 70% 25%, rgba(0,184,224,.06), transparent 260px);
+}
+
+.map-toolbar {
+  z-index: 6;
+}
+
+.map-toolbar span,
+.map-btn,
+.map-legend {
+  border-radius: 8px;
+  background: rgba(8,20,26,.82);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+
+.map-toolbar-right > span {
+  font-weight: 700;
+}
+
+.station-marker {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid rgba(255,255,255,.92);
+  background: rgba(20,35,43,.92);
+  box-shadow: 0 4px 13px rgba(0,0,0,.32);
+}
+
+.station-marker.wind-only {
+  background: rgba(38,53,29,.92);
+  border-color: rgba(211,231,126,.9);
+}
+
+.station-marker:hover,
+.station-marker.active {
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 0 0 3px rgba(0,184,224,.22), 0 8px 20px rgba(0,0,0,.34);
+}
+
+.station-marker.active {
+  border-color: var(--accent);
+}
+
+.wind-barb {
+  width: 26px;
+  height: 26px;
+}
+
+.wind-barb line,
+.wind-barb path {
+  stroke-width: 2.35;
+}
+
+.wind-speed-chip,
+.temp-chip {
+  min-width: 24px;
+  height: 16px;
+  line-height: 14px;
+  padding: 1px 5px;
+  font-size: 9px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.18);
+}
+
+.wind-speed-chip {
+  bottom: -9px;
+  background: #d6f04f;
+}
+
+.temp-chip {
+  top: -9px;
+}
+
+.station-label {
+  transform: translate(13px, -21px);
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 10px;
+  background: rgba(8,20,26,.88);
+  z-index: 4;
+}
+
+.station-panel {
+  padding: 18px;
+  position: sticky;
+  top: calc(var(--topbar-h) + 14px);
+  max-height: calc(100vh - var(--topbar-h) - 28px);
+}
+
+.station-panel h2 {
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.cards {
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 8px;
+}
+
+.metric-card {
+  padding: 10px 11px;
+  background: #f8fbfc;
+  border-color: var(--console-rule);
+}
+
+.metric-card strong {
+  font-size: 18px;
+}
+
+.wind-info,
+.heat-index-card,
+.mini-chart-wrap canvas {
+  border-color: var(--console-rule);
+  background: #f8fbfc;
+}
+
+.daily-grid {
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 10px;
+}
+
+.daily-card {
+  min-height: 94px;
+  align-items: flex-start;
+  background: #f8fbfc;
+  border-color: var(--console-rule);
+}
+
+.daily-icon {
+  display: none;
+}
+
+.daily-hi,
+.daily-lo,
+.daily-big {
+  font-size: 25px;
+}
+
+.section {
+  padding: 20px;
+  border-color: var(--console-rule);
+}
+
+.section-head {
+  margin-bottom: 14px;
+}
+
+.section-head h2 {
+  font-size: 22px;
+}
+
+.table-wrap,
+.chart-card {
+  border-color: var(--console-rule);
+}
+
+.windy-section {
+  padding: 20px;
+  background: #071116;
+  border-color: rgba(255,255,255,.08);
+}
+
+.windy-frame {
+  position: relative;
+  height: clamp(560px, 72vh, 820px);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0d1b22;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 18px 40px rgba(0,0,0,.24);
+}
+
+.windy-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.external-map-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--panel-ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+  background: #f8fbfc;
+}
+
+.windy-section .eyebrow {
+  color: #7be0ff;
+}
+
+.windy-section h2 {
+  color: #f2fbff;
+}
+
+.windy-section .external-map-link {
+  color: #eaf8fb;
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+}
+
+.external-map-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.module-board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.module-panel {
+  grid-column: span 2;
+  min-height: 220px;
+  padding: 18px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--panel-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-panel,
+.database-panel {
+  grid-column: span 3;
+}
+
+.module-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.module-head h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.module-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(0,184,224,.12);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.module-status.pending {
+  background: rgba(240,164,64,.14);
+  color: #b57012;
+}
+
+.alert-list {
+  display: grid;
+  gap: 9px;
+}
+
+.alert-item {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(240,164,64,.28);
+  background: rgba(240,164,64,.08);
+}
+
+.alert-item strong,
+.alert-item span {
+  display: block;
+}
+
+.alert-item span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.alert-item small {
+  display: block;
+  margin-top: 7px;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.alert-item.inactive {
+  border-color: var(--console-rule);
+  background: #f8fbfc;
+}
+
+.alert-item.official {
+  border-color: rgba(224,82,82,.28);
+  background: rgba(224,82,82,.08);
+}
+
+.module-empty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  line-height: 1.55;
+  background: #f8fbfc;
+}
+
+.wind-index-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.module-metric {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--console-rule);
+  background: #f8fbfc;
+}
+
+.module-metric.large {
+  grid-row: span 2;
+  background: #10242d;
+  color: #f2fbff;
+}
+
+.module-metric span,
+.module-metric em {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.module-metric.large span,
+.module-metric.large em {
+  color: rgba(242,251,255,.68);
+}
+
+.module-metric strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.module-metric.large strong {
+  font-size: 58px;
+  color: #d6f04f;
+}
+
+.module-metric small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.module-note {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.service-tile {
+  min-height: 74px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--console-rule);
+  background: #f8fbfc;
+}
+
+.service-tile strong,
+.service-tile span {
+  display: block;
+}
+
+.service-tile span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.service-tile.pending {
+  border-style: dashed;
+}
+
+.service-tile.pending_source,
+.service-tile.unavailable {
+  border-style: dashed;
+}
+
+.service-tile.active {
+  border-color: rgba(0,184,224,.22);
+  background: linear-gradient(180deg, rgba(0,184,224,.08), #f8fbfc);
+}
+
+.service-tile.wide {
+  grid-column: 1 / -1;
+}
+
+.service-tile small {
+  display: block;
+  margin-top: 6px;
+  color: var(--faint);
+  font-size: 11px;
+}
+
+.forecast-panel {
+  grid-column: 1 / -1;
+}
+
+.forecast-panel .service-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.forecast-tile {
+  min-height: 190px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--console-rule);
+  background: #f8fbfc;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 8px;
+}
+
+.forecast-tile > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.forecast-tile strong {
+  font-size: 20px;
+}
+
+.forecast-tile span,
+.forecast-tile p,
+.forecast-tile footer {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.forecast-tile img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.forecast-tile p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.forecast-tile footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.forecast-tile b {
+  color: var(--panel-ink);
+}
+
+.dataset-list {
+  display: grid;
+  gap: 8px;
+}
+
+.dataset-export {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #061216;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.dataset-export:hover {
+  filter: brightness(.95);
+}
+
+.database-summary-line,
+.dataset-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #f8fbfc;
+  border: 1px solid var(--console-rule);
+  font-size: 13px;
+}
+
+.dataset-row {
+  grid-template-columns: 1fr auto;
+}
+
+.database-summary-line span,
+.dataset-row span {
+  color: var(--muted);
+}
+
+.dataset-row strong {
+  color: var(--accent);
+}
+
+.dataset-row.pending_source strong {
+  color: #b57012;
+}
+
+.quality-panel,
+.index-panel,
+.warning-history-panel {
+  grid-column: span 2;
+}
+
+.quality-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quality-item {
+  padding: 10px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: #f8fbfc;
+}
+
+.quality-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.quality-item strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--panel-ink);
+  font-size: 18px;
+}
+
+.warning-event-list {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.warning-event {
+  padding: 9px 10px;
+  border: 1px solid var(--console-rule);
+  border-radius: 8px;
+  background: #f8fbfc;
+}
+
+.warning-event strong,
+.warning-event span {
+  display: block;
+}
+
+.warning-event span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.compact-export {
+  min-height: 38px;
+  padding: 0 12px;
+}
+
+input[type="datetime-local"] {
+  height: 38px;
+  min-width: 190px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  color: var(--panel-ink);
+  background: var(--panel);
+  font: inherit;
+}
+
+.group-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.group-chip {
+  padding: 0 12px;
+}
+
+@media (max-width: 900px) {
+  .overview-status,
+  .metric-matrix {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .map-wrap,
+  #weatherMap {
+    min-height: 520px;
+  }
+
+  .station-marker {
+    width: 32px;
+    height: 32px;
+  }
+
+  .wind-barb {
+    width: 24px;
+    height: 24px;
+  }
+
+  .daily-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .map-wrap,
+  #weatherMap {
+    min-height: 430px;
+  }
+
+  .map-toolbar-right > span,
+  .map-legend {
+    display: none;
+  }
+
+  .daily-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .windy-frame {
+    height: 520px;
+  }
+
+  .module-board,
+  .module-panel,
+  .alert-panel,
+  .database-panel {
+    display: block;
+  }
+
+  .module-panel {
+    margin-bottom: 12px;
+  }
+
+  .wind-index-panel,
+  .service-grid,
+  .quality-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .database-summary-line {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
