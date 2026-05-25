@@ -79,6 +79,38 @@ def test_offline_export_inlines_leaflet_assets(tmp_path):
     assert "20260524-chart2" not in html
 
 
+def test_offline_export_includes_cached_official_forecast(tmp_path):
+    from app.db import WeatherDatabase
+    from app.export_static import build_offline_html
+
+    db_path = tmp_path / "weather.sqlite"
+    db = WeatherDatabase(db_path)
+    db.init()
+    db.upsert_external_cache(
+        "official_forecast",
+        "https://xml.smg.gov.mo/c_7daysforecast.xml",
+        "active",
+        {
+            "status": "active",
+            "items": [
+                {
+                    "valid_for": "2026-05-24",
+                    "description": "多雲，有驟雨。",
+                    "temp_high": 31,
+                    "temp_low": 27,
+                }
+            ],
+        },
+    )
+
+    output = build_offline_html(db_path=db_path, output=tmp_path / "offline.html")
+    html = output.read_text(encoding="utf-8")
+
+    assert '"official_forecast": {"status": "active"' in html
+    assert '"valid_for": "2026-05-24"' in html
+    assert '"temp_high": 31' in html
+
+
 def test_chart_visualization_has_monitoring_quality_features():
     html = Path("app/static/index.html").read_text(encoding="utf-8")
     script = Path("app/static/app.js").read_text(encoding="utf-8")

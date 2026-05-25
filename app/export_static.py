@@ -75,11 +75,11 @@ def build_offline_html(db_path: str | Path = "data/weather.sqlite", output: str 
         "dashboard": {
             "wind_index": wind_index(latest),
             "comfort_index": comfort_index(latest),
-            "warnings": warning_summary(latest),
+            "warnings": warning_summary(latest, db=db),
             "water_level": water_level_summary(),
-            "air_quality": air_quality_summary(),
+            "air_quality": air_quality_summary(db=db),
             "database": database_summary(db),
-            "official_forecast": official_forecast_summary(),
+            "official_forecast": official_forecast_summary(db=db),
         },
     }
 
