@@ -126,6 +126,7 @@ function metricTier(value, metric) {
 // ── API ───────────────────────────────────────
 async function getJson(path) {
   if (window.OFFLINE_DATA) {
+    if (preferOfflineData()) return getOfflineJson(path);
     try {
       const data = await getLiveJson(path);
       window.LIVE_DATA_ACTIVE = true;
@@ -136,6 +137,13 @@ async function getJson(path) {
     }
   }
   return getLiveJson(path);
+}
+
+function preferOfflineData() {
+  const host = window.location.hostname;
+  return window.location.protocol === "file:" ||
+    host.endsWith("github.io") ||
+    host.endsWith("githubusercontent.com");
 }
 
 async function getLiveJson(path) {
@@ -1525,6 +1533,7 @@ function initHistoryControls() {
 
 // ── 刷新 ──────────────────────────────────────
 async function triggerRefresh() {
+  if (window.OFFLINE_DATA && preferOfflineData()) return;
   const btn = $("refreshBtn");
   btn?.classList.add("spinning");
   btn && (btn.disabled = true);

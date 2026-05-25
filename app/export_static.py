@@ -59,6 +59,7 @@ def build_offline_html(db_path: str | Path = "data/weather.sqlite", output: str 
             "database": "offline",
             "latest_fetch": db.latest_fetch(),
             "latest_success": db.latest_success(),
+            "latest_data_time": db.latest_data_time(),
         },
         "daily_summary": db.daily_summary(),
         "data_quality": {
