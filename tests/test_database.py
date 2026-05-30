@@ -2,6 +2,7 @@ from datetime import datetime
 
 from app.db import WeatherDatabase
 from app.models import WeatherReading
+from app.readings_csv import export_readings_csv, import_readings_csv
 
 
 def make_reading(value: float = 28.2) -> WeatherReading:
@@ -69,6 +70,29 @@ def test_external_cache_round_trips_json_payload(tmp_path):
     assert cached["status"] == "active"
     assert cached["items"][0]["temp_high"] == 31
     assert cached["cache_updated_at"]
+
+
+def test_readings_csv_round_trip_preserves_history_and_deduplicates(tmp_path):
+    source = WeatherDatabase(tmp_path / "source.sqlite")
+    source.init()
+    first = make_reading(28.2)
+    second = make_reading(29.4)
+    second.record_time = datetime(2026, 5, 23, 14, 25)
+    source.insert_readings([first, second])
+
+    csv_path = tmp_path / "readings.csv"
+    exported = export_readings_csv(source, csv_path)
+
+    restored = WeatherDatabase(tmp_path / "restored.sqlite")
+    restored.init()
+    imported_first = import_readings_csv(restored, csv_path)
+    imported_second = import_readings_csv(restored, csv_path)
+
+    assert exported == 2
+    assert imported_first == 2
+    assert imported_second == 0
+    assert restored.count_readings() == 2
+    assert restored.latest_by_station()["TG"]["temperature"] == 29.4
 
 
 def test_history_aggregated_groups_points_by_interval(tmp_path):
